@@ -1,0 +1,17 @@
+{
+  "name": "COBS and COBS/R decoding",
+  "apiVersion": "1.0.0",
+  "author": "Jonathan Reichelt Gjertsen",
+  "version": "1.0.0",
+  "description": "Decodes COBS or COBS/R encoded serial data.",
+  "extensions": {
+    "COBS decoder": {
+      "type": "HighLevelAnalyzer",
+      "entryPoint": "analyzers.CobsDecoder"
+    },
+    "COBS/R decoder": {
+      "type": "HighLevelAnalyzer",
+      "entryPoint": "analyzers.CobsrDecoder"
+    }
+  }
+}
