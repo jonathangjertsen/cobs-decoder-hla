@@ -1,5 +1,4 @@
-from saleae.analyzers import HighLevelAnalyzer, AnalyzerFrame, StringSetting, ChoicesSetting
-from saleae.data import GraphTime
+from saleae.analyzers import HighLevelAnalyzer, AnalyzerFrame, NumberSetting
 
 """
 The sections below were adapted from
@@ -130,6 +129,7 @@ class CobsXDecoder(HighLevelAnalyzer):
             "format": "ERROR: {{data.error}}"
         }
     }
+    number_of_prefix_bytes_after_0_byte = NumberSetting(min_value = 0, max_value = 10)
 
     def decode_bytes(self, x):
         pass
@@ -147,6 +147,8 @@ class CobsXDecoder(HighLevelAnalyzer):
             self.frame_start_time = frame.start_time
 
         if data == b"\0":
+            if len(self.received) >= self.number_of_prefix_bytes_after_0_byte:
+                del self.received[:int(self.number_of_prefix_bytes_after_0_byte)]
             if self.received:
                 try:
                     data = self.decode_bytes(b"".join(self.received))
