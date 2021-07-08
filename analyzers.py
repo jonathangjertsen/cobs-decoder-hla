@@ -173,7 +173,7 @@ class CobsXDecoder(HighLevelAnalyzer):
             self.frame_start_time = frame.start_time
         else:
             self.received.append(data)
-            self.frame_end_time = frame.end_time
+        self.frame_end_time = frame.end_time
         return retval
 
 
