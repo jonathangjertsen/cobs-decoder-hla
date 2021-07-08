@@ -137,38 +137,42 @@ class CobsXDecoder(HighLevelAnalyzer):
     def __init__(self):
         self.received = []
         self.frame_start_time = None
+        self.frame_end_time = None
 
     def decode(self, frame: AnalyzerFrame):
+        retval = None
         data = frame.data["data"]
 
         if self.frame_start_time is None:
             self.frame_start_time = frame.start_time
 
         if data == b"\0":
-            received, self.received = self.received, []
-            frame_start_time, self.frame_start_time = self.frame_start_time, None
-            try:
-                data = self.decode_bytes(b"".join(received))
-                return AnalyzerFrame(
-                    "Message",
-                    frame_start_time,
-                    frame.end_time,
-                    {
-                        "data": data,
-                    }
-                )
-            except DecodeError as de:
-                return AnalyzerFrame(
-                    "Error",
-                    frame_start_time,
-                    frame.end_time,
-                    {
-                        "error": str(de),
-                    }
-                )
-            
+            if self.received:
+                try:
+                    data = self.decode_bytes(b"".join(self.received))
+                    retval = AnalyzerFrame(
+                        "Message",
+                        self.frame_start_time,
+                        self.frame_end_time,
+                        {
+                            "data": data,
+                        }
+                    )
+                except DecodeError as de:
+                    retval = AnalyzerFrame(
+                        "Error",
+                        self.frame_start_time,
+                        self.frame_end_time,
+                        {
+                            "error": str(de),
+                        }
+                    )
+            self.received = []
+            self.frame_start_time = frame.start_time
         else:
             self.received.append(data)
+        self.frame_end_time = frame.end_time
+        return retval
 
 
 class CobsDecoder(CobsXDecoder):
